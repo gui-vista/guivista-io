@@ -3,8 +3,7 @@ package org.guiVista.io
 import gio2.*
 import glib2.TRUE
 import glib2.g_object_unref
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.toKString
+import kotlinx.cinterop.*
 import org.guiVista.core.Closable
 
 /** File and Directory Handling. */
@@ -109,7 +108,7 @@ class File private constructor(filePtr: CPointer<GFile>?) : Closable {
 
     companion object {
         /** Creates a new [File] instance from a filePtr. */
-        fun fromFilePtr(filePtr: CPointer<GFile>): File = File(filePtr)
+        fun fromFilePtr(filePtr: CPointer<GFile>?): File = File(filePtr)
 
         /**
          * Constructs a [File] for a given path. This operation never fails, but the returned object might not support
@@ -151,5 +150,33 @@ class File private constructor(filePtr: CPointer<GFile>?) : Closable {
 
     override fun close() {
         g_object_unref(gFilePtr)
+    }
+
+    /**
+     * Gets the requested information about the files in a directory. The result is a [FileEnumerator] object that will
+     * give out GFileInfo objects for all the files in the directory. The [attributes] value is a string that specifies
+     * the file attributes that should be gathered. It is not an error if it's not possible to read a particular
+     * requested attribute from a file - it just won't be set. Attributes should be a comma-separated list of
+     * attributes, or attribute wildcards. The wildcard "*" means all attributes, and a wildcard like "standard::*"
+     * means all attributes in the standard namespace. An example attribute query be "standard::*,owner::user". The
+     * standard attributes are available as defines, like *G_FILE_ATTRIBUTE_STANDARD_NAME*.
+     *
+     * If cancellable isn't *null* then the operation can be cancelled by triggering the cancellable object from
+     * another thread. If the operation was cancelled the error *G_IO_ERROR_CANCELLED* will be returned. If the file
+     * doesn't exist the *G_IO_ERROR_NOT_FOUND* error will be returned. If the file isn't a directory the
+     * *G_IO_ERROR_NOT_DIRECTORY* error will be returned. Other errors are possible too.
+     * @param attributes An attribute query string.
+     * @param flags A set of GFileQueryInfoFlags.
+     * @return A [FileEnumerator] if successful, *null* on error.
+     */
+    fun enumerateChildren(attributes: String, flags: GAppInfoCreateFlags): FileEnumerator? {
+        val tmp = g_file_enumerate_children(
+            file = gFilePtr,
+            attributes = attributes,
+            flags = flags,
+            cancellable = null,
+            error = null
+        )
+        return if (tmp != null) FileEnumerator(tmp) else null
     }
 }
