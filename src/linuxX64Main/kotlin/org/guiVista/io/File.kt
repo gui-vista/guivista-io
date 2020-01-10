@@ -1,8 +1,11 @@
 package org.guiVista.io
 
 import gio2.*
+import glib2.TRUE
+import glib2.g_object_unref
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.toKString
+import org.guiVista.core.Closable
 
 /** File and Directory Handling. */
 @Suppress("EqualsOrHashCode")
