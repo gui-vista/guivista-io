@@ -138,6 +138,16 @@ class File private constructor(filePtr: CPointer<GFile>?) : Closable {
     }
 
     /**
+     * Utility function to inspect the GFileType of a [File]. This is implemented using `g_file_query_info()`, and as
+     * such does blocking I/O. The primary use case of this function is to check if a [File] is a regular file,
+     * directory, or symbolic link.
+     * @param flags A set of GFileQueryInfoFlags passed to `g_file_query_info()`.
+     * @return The GFileType of the [File], and *G_FILE_TYPE_UNKNOWN* if the file doesn't exist.
+     */
+    fun queryFileType(flags: GFileQueryInfoFlags): GFileType =
+        g_file_query_file_type(file = gFilePtr, cancellable = null, flags = flags)
+
+    /**
      * Creates a hash value for the [File] instance. This function doesn't do any blocking I/O.
      * @return If [File] instance isn't valid then return *0*, otherwise an Int that can be used as hash value for the
      * [File] instance. This function is intended for easily hashing a [File] to add to a GHashTable, or similar data
@@ -145,7 +155,7 @@ class File private constructor(filePtr: CPointer<GFile>?) : Closable {
      */
     fun hash(): UInt = g_file_hash(gFilePtr)
 
-    external override fun equals(other: Any?): Boolean =
+    override fun equals(other: Any?): Boolean =
         if (other is File) g_file_equal(gFilePtr, other.gFilePtr) == TRUE else false
 
     override fun close() {
