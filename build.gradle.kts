@@ -1,5 +1,5 @@
-group = "org.example"
-version = "1.0-SNAPSHOT"
+group = "org.guivista"
+version = "0.1-SNAPSHOT"
 
 plugins {
     kotlin("multiplatform") version "1.3.61"
@@ -19,7 +19,7 @@ kotlin {
                 includeDirs("/usr/include/glib-2.0/gio")
             }
             dependencies {
-                val guiVistaCoreVer = "1.0-SNAPSHOT"
+                val guiVistaCoreVer = "0.1-SNAPSHOT"
                 implementation("org.guivista:guivista-core-linuxx64:$guiVistaCoreVer")
             }
         }
