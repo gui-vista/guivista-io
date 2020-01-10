@@ -1,4 +1,5 @@
 # Additional files/dirs to ignore.
+build/
 .gradle/
 .idea/
 gradlew.bat

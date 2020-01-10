@@ -1,0 +1,4 @@
+headers = gio.h gobject/gobject.h glib.h
+headerFilter = gio/* gobject/* glib/*
+compilerOpts.linux = -I/usr/include/glib-2.0/gio -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+linkerOpts.linux = -L/usr/lib/x86_64-linux-gnu -lgio-2.0 -lgobject-2.0 -lglib-2.0
