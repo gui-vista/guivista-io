@@ -3,6 +3,7 @@ package org.guiVista.io
 import gio2.*
 import glib2.GError
 import glib2.TRUE
+import glib2.g_object_unref
 import kotlinx.cinterop.*
 import org.guiVista.core.Closable
 import org.guiVista.core.Error
@@ -38,6 +39,7 @@ class FileEnumerator(fileEnumeratorPtr: CPointer<GFileEnumerator>) : Closable {
      */
     override fun close() {
         g_file_enumerator_close(enumerator = gFileEnumeratorPtr, cancellable = null, error = closeErrorPtrVar.ptr)
+        g_object_unref(gFileEnumeratorPtr)
         arena.clear()
     }
 
