@@ -81,6 +81,42 @@ interface ApplicationBase : ObjectBase {
         disconnectGSignal(gApplicationPtr, handlerId)
     }
 
+    /**
+     * Sends a [notification] on behalf of application to the desktop shell. There is no guarantee that the
+     * notification is displayed immediately, or even at all. Notifications **may** persist after the application
+     * exits. It will be D-Bus-activated when the [notification], or one of its actions is activated. Modifying
+     * [notification] after this call has no effect. However the object can be reused for a later call to this function.
+     *
+     * The [id] may be any string that uniquely identifies the event for the [application][ApplicationBase]. It does
+     * not need to be in any special format. For example, "new-message" might be appropriate for a notification about
+     * new messages. If a previous notification was sent with the same [id] it will be replaced with [notification],
+     * and shown again as if it was a new notification. This works even for notifications sent from a previous
+     * execution of the [application][ApplicationBase], as long as [id] is the same string.
+     *
+     * Note that [id] may be *""* (an empty String), but it is impossible to replace, or withdraw notifications without
+     * an id. If [notification] is no longer relevant it can be withdrawn with [withdrawNotification].
+     * @param id The ID of the [application][ApplicationBase], or *""* (an empty String).
+     * @param notification The notification to send.
+     */
+    fun sendNotification(id: String = "", notification: Notification) {
+        g_application_send_notification(application = gApplicationPtr, id = id,
+            notification = notification.gNotificationPtr)
+    }
+
+    /**
+     * Withdraws a notification that was sent with [sendNotification]. This call does nothing if a notification with
+     * [id] doesn't exist, or the notification was never sent. This function works even for notifications sent in
+     * previous executions of this [application][ApplicationBase], as long as [id] is the same as it was for the sent
+     * notification.
+     *
+     * Note that notifications are dismissed when the user clicks on one of the buttons in a notification, or triggers
+     * its default action, so there is no need to explicitly withdraw the notification in that case.
+     * @param id The ID of the previously sent notification..
+     */
+    fun withdrawNotification(id: String) {
+        g_application_withdraw_notification(gApplicationPtr, id)
+    }
+
     override fun close() {
         g_object_unref(gApplicationPtr)
     }
