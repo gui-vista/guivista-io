@@ -169,30 +169,19 @@ class File private constructor(filePtr: CPointer<GFile>?) : Closable {
      * depend on what kind of filesystem the file is on.
      * @param attributes An attribute query String.
      * @param flags A set of GFileQueryInfoFlags.
-     * @return A Pair consisting of Error, and GFileInfo. Note that GFileInfo will be *null* if a error has occurred.
+     * @param error The [Error] instance to use for storing error information.
+     * @return A [FileInfo] instance, or *null* if a error has occurred.
      */
-    fun queryInfo(attributes: String, flags: GFileQueryInfoFlags): Pair<Error, FileInfo?> = memScoped {
-        val errorPtrVar = alloc<CPointerVar<GError>>()
+    fun queryInfo(attributes: String, flags: GFileQueryInfoFlags, error: Error): FileInfo? {
         val fileInfoPtr = g_file_query_info(
             file = gFilePtr,
             attributes = attributes,
             flags = flags,
-            error = errorPtrVar.ptr,
+            error = cValuesOf(error.gErrorPtr),
             cancellable = null
         )
-        val error = createError(errorPtrVar)
-        g_error_free(errorPtrVar.ptr[0])
-        return if (fileInfoPtr != null) error to FileInfo(fileInfoPtr) else error to null
+        return if (fileInfoPtr != null) FileInfo(fileInfoPtr) else null
     }
-
-    private fun createError(errorPtrVar: CPointerVar<GError>?) =
-        if (errorPtrVar != null) {
-            Error.fromLiteral(domain = errorPtrVar.pointed?.domain ?: 0u, code = errorPtrVar.pointed?.code ?: 0,
-                message = errorPtrVar.pointed?.message?.toKString() ?: "")
-        } else {
-            // Create a "empty" Error.
-            Error.fromLiteral(domain = 0u, code = 0, message = "")
-        }
 
     /**
      * Creates a hash value for the [File] instance. This function doesn't do any blocking I/O.
