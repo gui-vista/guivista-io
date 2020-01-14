@@ -1,10 +1,13 @@
 package org.guiVista.io
 
 import gio2.*
+import glib2.GError
 import glib2.TRUE
+import glib2.g_error_free
 import glib2.g_object_unref
 import kotlinx.cinterop.*
 import org.guiVista.core.Closable
+import org.guiVista.core.Error
 
 /** File and Directory Handling. */
 @Suppress("EqualsOrHashCode")
@@ -16,7 +19,7 @@ class File private constructor(filePtr: CPointer<GFile>?) : Closable {
      * Windows possibly a drive letter). The base name is a byte string (**not** UTF-8). It has no defined encoding, or
      * rules other than it may not contain zero bytes. If you want to use file names in a user interface you **should**
      * use the display name that you can get by requesting the `G_FILE_ATTRIBUTE_STANDARD_DISPLAY_NAME` attribute, with
-     * `g_file_query_info()`.
+     * [queryInfo].
      *
      * No blocking I/O is done with the property. This property will return the [file's][File] base name, or *""* (an
      * empty String) if the [File] instance is invalid.
@@ -138,14 +141,58 @@ class File private constructor(filePtr: CPointer<GFile>?) : Closable {
     }
 
     /**
-     * Utility function to inspect the GFileType of a [File]. This is implemented using `g_file_query_info()`, and as
-     * such does blocking I/O. The primary use case of this function is to check if a [File] is a regular file,
-     * directory, or symbolic link.
-     * @param flags A set of GFileQueryInfoFlags passed to `g_file_query_info()`.
+     * Utility function to inspect the GFileType of a [File]. This function does blocking I/O. The primary use case of
+     * this function is to check if a [File] is a regular file, directory, or symbolic link.
+     * @param flags A set of GFileQueryInfoFlags.
      * @return The GFileType of the [File], and *G_FILE_TYPE_UNKNOWN* if the file doesn't exist.
      */
     fun queryFileType(flags: GFileQueryInfoFlags): GFileType =
         g_file_query_file_type(file = gFilePtr, cancellable = null, flags = flags)
+
+    /**
+     * Gets the requested information about specified file. The result is a [FileInfo] object that contains key-value
+     * attributes (such as the type or size of the file). The [attributes] value is a String that specifies the file
+     * attributes that should be gathered. It is not an error if it's not possible to read a particular requested
+     * attribute from a file - it just won't be set. Attributes should be a comma-separated list of attributes, or
+     * attribute wildcards. The wildcard "*" means **all** attributes, and a wildcard like "standard::*" means all
+     * attributes in the standard namespace. An example attribute query would be "standard::*,owner::user". The
+     * standard attributes are available as defines like `G_FILE_ATTRIBUTE_STANDARD_NAME`.
+     *
+     * If cancellable isn't *null* then the operation can be cancelled by triggering the cancellable object from
+     * another thread. If the operation was cancelled the error `G_IO_ERROR_CANCELLED` will be returned. For symlinks
+     * normally the information about the target of the symlink is returned, rather than information about the symlink
+     * itself. However if you pass `G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS` in [flags] the information about the symlink
+     * itself will be returned. Also for symlinks that point to non-existing files the information about the symlink
+     * itself will be returned.
+     *
+     * If the file doesn't exist the `G_IO_ERROR_NOT_FOUND` error will be returned. Other errors are possible too, and
+     * depend on what kind of filesystem the file is on.
+     * @param attributes An attribute query String.
+     * @param flags A set of GFileQueryInfoFlags.
+     * @return A Pair consisting of Error, and GFileInfo. Note that GFileInfo will be *null* if a error has occurred.
+     */
+    fun queryInfo(attributes: String, flags: GFileQueryInfoFlags): Pair<Error, FileInfo?> = memScoped {
+        val errorPtrVar = alloc<CPointerVar<GError>>()
+        val fileInfoPtr = g_file_query_info(
+            file = gFilePtr,
+            attributes = attributes,
+            flags = flags,
+            error = errorPtrVar.ptr,
+            cancellable = null
+        )
+        val error = createError(errorPtrVar)
+        g_error_free(errorPtrVar.ptr[0])
+        return if (fileInfoPtr != null) error to FileInfo(fileInfoPtr) else error to null
+    }
+
+    private fun createError(errorPtrVar: CPointerVar<GError>?) =
+        if (errorPtrVar != null) {
+            Error.fromLiteral(domain = errorPtrVar.pointed?.domain ?: 0u, code = errorPtrVar.pointed?.code ?: 0,
+                message = errorPtrVar.pointed?.message?.toKString() ?: "")
+        } else {
+            // Create a "empty" Error.
+            Error.fromLiteral(domain = 0u, code = 0, message = "")
+        }
 
     /**
      * Creates a hash value for the [File] instance. This function doesn't do any blocking I/O.

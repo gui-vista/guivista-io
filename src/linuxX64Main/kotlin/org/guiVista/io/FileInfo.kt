@@ -19,7 +19,7 @@ class FileInfo(fileInfoPtr: CPointer<GFileInfo>? = null) : Closable {
     var isSymlink: Boolean
         get() = g_file_info_get_is_symlink(gFileInfoPtr) == TRUE
         set(value) = g_file_info_set_is_symlink(gFileInfoPtr, if (value) TRUE else FALSE)
-    /** Name f the file. */
+    /** Name of the file. */
     var name: String
         get() = g_file_info_get_name(gFileInfoPtr)?.toKString() ?: ""
         set(value) = g_file_info_set_name(gFileInfoPtr, value)
