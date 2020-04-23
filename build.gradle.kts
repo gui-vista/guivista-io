@@ -2,7 +2,7 @@ group = "org.guivista"
 version = "0.1-SNAPSHOT"
 
 plugins {
-    kotlin("multiplatform") version "1.3.61"
+    kotlin("multiplatform") version "1.3.72"
     `maven-publish`
 }
 
