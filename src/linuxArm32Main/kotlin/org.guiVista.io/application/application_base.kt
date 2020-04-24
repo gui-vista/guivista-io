@@ -31,15 +31,18 @@ actual interface ApplicationBase : ObjectBase {
     var resourceBasePath: String
         get() = g_application_get_resource_base_path(gApplicationPtr)?.toKString() ?: ""
         set(value) = g_application_set_resource_base_path(gApplicationPtr, value)
+
     /**
      * Whether the application is currently marked as busy through `g_application_mark_busy()`, or
      * `g_application_bind_busy_property()`. Default value is *false*.
      */
     val isBusy: Boolean
         get() = g_application_get_is_busy(gApplicationPtr) == TRUE
+
     /** If `g_application_register()` has been called. Default value is *false*. */
     val isRegistered: Boolean
         get() = g_application_get_is_registered(gApplicationPtr) == TRUE
+
     /** If this application instance is remote. Default value is *false*. */
     val isRemote: Boolean
         get() = g_application_get_is_remote(gApplicationPtr) == TRUE
@@ -50,7 +53,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param slot The event handler for the signal.
      * @param userData User data to pass through to the [slot].
      */
-    fun connectActivateSignal(slot: CPointer<ActivateSlot>, userData: gpointer): ULong =
+    fun connectActivateSignal(slot: CPointer<ActivateSlot>, userData: gpointer): UInt =
         connectGSignal(obj = gApplicationPtr, signal = ACTIVATE_SIGNAL, slot = slot, data = userData)
 
     /**
@@ -59,7 +62,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param slot The event handler for the signal.
      * @param userData User data to pass through to the [slot].
      */
-    fun connectStartupSignal(slot: CPointer<StartupSlot>, userData: gpointer): ULong =
+    fun connectStartupSignal(slot: CPointer<StartupSlot>, userData: gpointer): UInt =
         connectGSignal(obj = gApplicationPtr, signal = STARTUP_SIGNAL, slot = slot, data = userData)
 
     /**
@@ -68,7 +71,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param slot The event handler for the signal.
      * @param userData User data to pass through to the [slot].
      */
-    fun connectShutdownSignal(slot: CPointer<ShutdownSlot>, userData: gpointer): ULong =
+    fun connectShutdownSignal(slot: CPointer<ShutdownSlot>, userData: gpointer): UInt =
         connectGSignal(obj = gApplicationPtr, signal = SHUTDOWN_SIGNAL, slot = slot, data = userData)
 
     /**
@@ -80,7 +83,7 @@ actual interface ApplicationBase : ObjectBase {
 
     override fun disconnectSignal(handlerId: ULong) {
         super.disconnectSignal(handlerId)
-        disconnectGSignal(gApplicationPtr, handlerId)
+        disconnectGSignal(gApplicationPtr, handlerId.toUInt())
     }
 
     /**

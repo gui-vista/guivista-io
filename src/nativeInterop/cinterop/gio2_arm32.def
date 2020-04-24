@@ -1,0 +1,4 @@
+package = gio2
+headers = gio.h
+compilerOpts.linux = -I/mnt/pi_image/usr/include/glib-2.0 -I/mnt/pi_image/usr/lib/arm-linux-gnueabihf/glib-2.0/include
+linkerOpts.linux = -L/mnt/pi_image/usr/lib/arm-linux-gnueabihf -lgio-2.0
