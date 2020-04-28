@@ -1,5 +1,10 @@
+import java.util.Properties
+
+val gitLabSettings = fetchGitLabSettings()
+val projectSettings = fetchProjectSettings()
+
 group = "org.guivista"
-version = "0.1-SNAPSHOT"
+version = if (projectSettings.isDevVer) "${projectSettings.libVer}-dev" else projectSettings.libVer
 
 plugins {
     kotlin("multiplatform") version "1.3.72"
@@ -9,11 +14,14 @@ plugins {
 repositories {
     jcenter()
     mavenCentral()
-    mavenLocal()
+    maven {
+        val guiVistaCore = "16245519"
+        url = uri("https://gitlab.com/api/v4/projects/$guiVistaCore/packages/maven")
+    }
 }
 
 kotlin {
-    val guiVistaCoreVer = "0.1-SNAPSHOT"
+    val guiVistaCoreVer = "0.1"
     linuxX64("linuxX64") {
         compilations.getByName("main") {
             cinterops.create("gio2_x64") {
@@ -61,6 +69,56 @@ kotlin {
     }
 }
 
+publishing {
+    repositories {
+        maven {
+            val projectId = gitLabSettings.projectId
+            url = uri("https://gitlab.com/api/v4/projects/$projectId/packages/maven")
+            credentials(HttpHeaderCredentials::class.java) {
+                name = "Private-Token"
+                value = gitLabSettings.token
+            }
+            authentication {
+                create("header", HttpHeaderAuthentication::class.java)
+            }
+        }
+    }
+}
+
 tasks.create("createLinuxLibraries") {
     dependsOn("linuxX64MainKlibrary", "linuxArm32MainKlibrary")
+}
+
+tasks.getByName("publish") {
+    doFirst { println("Project Version: ${project.version}") }
+}
+
+data class GitLabSettings(val token: String, val projectId: Int)
+
+fun fetchGitLabSettings(): GitLabSettings {
+    var token = ""
+    var projectId = -1
+    val properties = Properties()
+    file("gitlab.properties").inputStream().use { inputStream ->
+        properties.load(inputStream)
+        token = properties.getProperty("token") ?: ""
+        @Suppress("RemoveSingleExpressionStringTemplate")
+        projectId = "${properties.getProperty("projectId")}".toInt()
+    }
+    return GitLabSettings(token = token, projectId = projectId)
+}
+
+data class ProjectSettings(val libVer: String, val isDevVer: Boolean)
+
+fun fetchProjectSettings(): ProjectSettings {
+    var libVer = "SNAPSHOT"
+    var isDevVer = true
+    val properties = Properties()
+    file("project.properties").inputStream().use { inputStream ->
+        properties.load(inputStream)
+        libVer = properties.getProperty("libVer") ?: "SNAPSHOT"
+        @Suppress("RemoveSingleExpressionStringTemplate")
+        isDevVer = "${properties.getProperty("isDevVer")}".toBoolean()
+    }
+    return ProjectSettings(libVer = libVer, isDevVer = isDevVer)
 }
