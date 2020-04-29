@@ -1,0 +1,7 @@
+package = gio2
+headers = gio.h
+linkerOpts = -lgio-2.0
+compilerOpts.linux_x64 = -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+linkerOpts.linux_x64 = -L/usr/lib/x86_64-linux-gnu
+compilerOpts.linux_arm32_hfp = -I/mnt/pi_image/usr/include/glib-2.0 -I/mnt/pi_image/usr/lib/arm-linux-gnueabihf/glib-2.0/include
+linkerOpts.linux_arm32_hfp = -L/mnt/pi_image/usr/lib/arm-linux-gnueabihf

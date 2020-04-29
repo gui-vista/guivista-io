@@ -21,25 +21,24 @@ repositories {
 }
 
 kotlin {
-    val guiVistaCoreVer = "0.1"
     linuxX64("linuxX64") {
         compilations.getByName("main") {
-            cinterops.create("gio2_x64") {
-                includeDirs("/usr/include/glib-2.0/gio")
-            }
             dependencies {
-                implementation("org.guivista:guivista-core-linuxx64:$guiVistaCoreVer")
+                implementation("org.guivista:guivista-core-linuxx64:${projectSettings.libVer}")
+            }
+            cinterops.create("gio2") {
+                includeDirs("/usr/include/glib-2.0/gio")
             }
         }
     }
 
     linuxArm32Hfp("linuxArm32") {
         compilations.getByName("main") {
-            cinterops.create("gio2_arm32") {
-                includeDirs("/mnt/pi_image/usr/include/glib-2.0/gio")
-            }
             dependencies {
-                implementation("org.guivista:guivista-core-linuxarm32:$guiVistaCoreVer")
+                implementation("org.guivista:guivista-core-linuxarm32:${projectSettings.libVer}")
+            }
+            cinterops.create("gio2") {
+                includeDirs("/mnt/pi_image/usr/include/glib-2.0/gio")
             }
         }
     }
@@ -53,7 +52,7 @@ kotlin {
             dependencies {
                 val kotlinVer = "1.3.72"
                 implementation(kotlin("stdlib-common", kotlinVer))
-                implementation("org.guivista:guivista-core:$guiVistaCoreVer")
+                implementation("org.guivista:guivista-core:${projectSettings.libVer}")
             }
         }
 
