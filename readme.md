@@ -15,12 +15,7 @@ In order to use the library with Gradle (version 5.4 or higher) do the following
 3. Insert the following into the **repositories** block:
 ```kotlin
 maven {
-    val guiVistaCore = "16245519"
-    url = uri("https://gitlab.com/api/v4/projects/$guiVistaCore/packages/maven")
-}
-maven {
-    val guiVistaIo = "16243425"
-    url = uri("https://gitlab.com/api/v4/projects/$guiVistaIo/packages/maven")
+    url = uri("https://dl.bintray.com/guivista/public")
 }
 ```
 4. Create a library definition file called **glib2.def** which contains the following:
@@ -44,12 +39,7 @@ The build file should look similar to the following:
 // ...
 repositories {
     maven {
-        val guiVistaCore = "16245519"
-        url = uri("https://gitlab.com/api/v4/projects/$guiVistaCore/packages/maven")
-    }
-    maven {
-        val guiVistaIo = "16243425"
-        url = uri("https://gitlab.com/api/v4/projects/$guiVistaIo/packages/maven")
+        url = uri("https://dl.bintray.com/guivista/public")
     }
 }
 
@@ -59,7 +49,7 @@ kotlin {
         // ...
         compilations.getByName("main") {
             dependencies {
-                val guiVistaVer = "0.1"
+                val guiVistaVer = "0.1.2"
                 cinterops.create("glib2")
                 cinterops.create("gio2")
                 implementation("org.guivista:guivista-io:$guiVistaVer")
