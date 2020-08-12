@@ -6,5 +6,7 @@ import gio2.g_application_new
 import kotlinx.cinterop.CPointer
 
 actual class Application actual constructor(id: String) : ApplicationBase {
-    override val gApplicationPtr: CPointer<GApplication>? = g_application_new(id, G_APPLICATION_FLAGS_NONE)
+    override val gApplicationPtr: CPointer<GApplication>? =
+        if (gio2.g_application_id_is_valid(id) == glib2.TRUE) g_application_new(id, G_APPLICATION_FLAGS_NONE)
+        else throw IllegalArgumentException("Application ID isn't valid.")
 }

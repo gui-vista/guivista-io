@@ -4,16 +4,16 @@ import gio2.*
 import glib2.TRUE
 import glib2.g_object_unref
 import glib2.gpointer
-import kotlinx.cinterop.CFunction
-import kotlinx.cinterop.CPointer
-import kotlinx.cinterop.toKString
+import kotlinx.cinterop.*
 import org.guiVista.core.ObjectBase
 import org.guiVista.core.connectGSignal
 import org.guiVista.core.disconnectGSignal
+import org.guiVista.io.File
 
 private const val ACTIVATE_SIGNAL = "activate"
 private const val STARTUP_SIGNAL = "startup"
 private const val SHUTDOWN_SIGNAL = "shutdown"
+private const val OPEN_SIGNAL = "open"
 
 actual interface ApplicationBase : ObjectBase {
     val gApplicationPtr: CPointer<GApplication>?
@@ -37,18 +37,86 @@ actual interface ApplicationBase : ObjectBase {
      */
     val isBusy: Boolean
         get() = g_application_get_is_busy(gApplicationPtr) == TRUE
+
     /** If `g_application_register()` has been called. Default value is *false*. */
     val isRegistered: Boolean
         get() = g_application_get_is_registered(gApplicationPtr) == TRUE
+
     /** If this application instance is remote. Default value is *false*. */
     val isRemote: Boolean
         get() = g_application_get_is_remote(gApplicationPtr) == TRUE
+
+    /**
+     * Increases the use count of the application. Use this function to indicate that the application has a reason to
+     * continue to run. For example, [hold] is called by GTK+ when a top level window is on the screen. To cancel the
+     * hold call [release].
+     */
+    fun hold() {
+        g_application_hold(gApplicationPtr)
+    }
+
+    /**
+     * Decrease the use count of the application. When the use count reaches *0* the application will stop running.
+     * **Never** call this function except to cancel the effect of a previous call to [hold].
+     */
+    fun release() {
+        g_application_release(gApplicationPtr)
+    }
+
+    /**
+     * Immediately quits the application. Upon return to the main loop, [run] will return, calling only the 'shutdown'
+     * function before doing so. The hold count is ignored. Take care if your code has called [hold] on the
+     * application, and is therefore still expecting it to exist. **Note** that you may have called [hold] indirectly,
+     * for example through `gtk_application_add_window`.
+     *
+     * The result of calling [run] again after it returns is unspecified.
+     */
+    fun quit() {
+        g_application_quit(gApplicationPtr)
+    }
+
+    /**
+     * Opens the given files. In essence this results in the *open* signal being emitted in the primary instance. The
+     * [hint] is simply passed through to the ::open signal. It is intended to be used by applications that have
+     * multiple modes for opening files (eg: *view* vs *edit*, etc). Unless you have a need for this functionality you
+     * should not set the [hint] parameter.
+     *
+     * The application **MUST** be registered before calling this function, and it **MUST** have the
+     * `G_APPLICATION_HANDLES_OPEN` flag set.
+     * @param files An array of files to open.
+     * @param hint The hint to use.
+     */
+    fun open(files: Array<File>, hint: String = "") {
+        if (files.isEmpty()) throw IllegalArgumentException("The files parameter cannot be empty.")
+        val tmp = files.map { it.gFilePtr }.toTypedArray()
+        g_application_open(application = gApplicationPtr, files = cValuesOf(*tmp), n_files = files.size, hint = hint)
+    }
+
+    /**
+     * Increases the busy count of the application. Use this function to indicate that the application is busy, for
+     * instance while a long running operation is pending. The busy state will be exposed to other processes, so a
+     * session shell will use that information to indicate the state to the user (e.g. with a spinner).
+     *
+     * To cancel the busy indication use [unmarkBusy].
+     */
+    fun markBusy() {
+        g_application_mark_busy(gApplicationPtr)
+    }
+
+    /**
+     * Decreases the busy count of the application. When the busy count reaches *0* the new state will be propagated to
+     * other processes. This function **MUST** only be called to cancel the effect of a previous call to [markBusy].
+     */
+    fun unmarkBusy() {
+        g_application_unmark_busy(gApplicationPtr)
+    }
 
     /**
      * Connects the *activate* signal to a [slot] on a application. This signal is used for initialising the
      * application window, and is emitted on the primary instance when an activation occurs.
      * @param slot The event handler for the signal.
      * @param userData User data to pass through to the [slot].
+     * @return The handler ID.
      */
     fun connectActivateSignal(slot: CPointer<ActivateSlot>, userData: gpointer): ULong =
         connectGSignal(obj = gApplicationPtr, signal = ACTIVATE_SIGNAL, slot = slot, data = userData)
@@ -58,6 +126,7 @@ actual interface ApplicationBase : ObjectBase {
      * instance immediately after registration.
      * @param slot The event handler for the signal.
      * @param userData User data to pass through to the [slot].
+     * @return The handler ID.
      */
     fun connectStartupSignal(slot: CPointer<StartupSlot>, userData: gpointer): ULong =
         connectGSignal(obj = gApplicationPtr, signal = STARTUP_SIGNAL, slot = slot, data = userData)
@@ -67,9 +136,20 @@ actual interface ApplicationBase : ObjectBase {
      * registered primary instance immediately after the main loop terminates.
      * @param slot The event handler for the signal.
      * @param userData User data to pass through to the [slot].
+     * @return The handler ID.
      */
     fun connectShutdownSignal(slot: CPointer<ShutdownSlot>, userData: gpointer): ULong =
         connectGSignal(obj = gApplicationPtr, signal = SHUTDOWN_SIGNAL, slot = slot, data = userData)
+
+    /**
+     * Connects the *open* signal to a [slot] on a application. The *open* signal is emitted only when there are files
+     * to open. Refer to [open][ApplicationBase.open] for more information.
+     * @param slot The event handler for the signal.
+     * @param userData User data to pass through to the [slot].
+     * @return The handler ID.
+     */
+    fun connectOpenSignal(slot: CPointer<OpenSlot>, userData: gpointer): ULong =
+        connectGSignal(obj = gApplicationPtr, signal = OPEN_SIGNAL, slot = slot, data = userData)
 
     /**
      * Runs the application.
@@ -144,3 +224,19 @@ typealias StartupSlot = CFunction<(application: CPointer<GApplication>, userData
  * 2. userData: gpointer
  */
 typealias ShutdownSlot = CFunction<(application: CPointer<GApplication>, userData: gpointer) -> Unit>
+
+/**
+ * The event handler for the *open* signal that occurs when there are files to open. Arguments:
+ * 1. application: CPointer<GApplication>
+ * 2. files: gpointer
+ * 3. totalFiles: Int
+ * 4. hint: CPointer<ByteVar>
+ * 5. userData: gpointer
+ */
+typealias OpenSlot = CFunction<(
+    application: CPointer<GApplication>,
+    files: gpointer,
+    totalFiles: Int,
+    hint: CPointer<ByteVar>,
+    userData: gpointer
+) -> Unit>
