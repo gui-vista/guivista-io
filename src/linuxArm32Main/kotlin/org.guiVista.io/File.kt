@@ -23,6 +23,12 @@ actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
             val tmp = g_file_get_parent(gFilePtr)
             return if (tmp != null) File(tmp) else null
         }
+    actual val peekPath: String
+        get() = g_file_peek_path(gFilePtr)?.toKString() ?: ""
+    actual val isNative: Boolean
+        get() = g_file_is_native(gFilePtr) == TRUE
+    actual val uriScheme: String
+        get() = g_file_get_uri_scheme(gFilePtr)?.toKString() ?: ""
 
     actual fun hasParent(parent: File): Boolean = g_file_has_parent(gFilePtr, parent.gFilePtr) == TRUE
 
@@ -40,6 +46,8 @@ actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
         return if (tmp != null) File(tmp) else null
     }
 
+    actual fun hasUriScheme(uriScheme: String): Boolean = g_file_has_uri_scheme(gFilePtr, uriScheme) == TRUE
+
     actual companion object {
         /** Creates a new [File] instance from a filePtr. */
         fun fromFilePtr(filePtr: CPointer<GFile>?): File = File(filePtr)
@@ -49,6 +57,10 @@ actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
         actual fun fromUri(uri: String): File = File(g_file_new_for_uri(uri))
 
         actual fun parseName(parseName: String): File = File(g_file_parse_name(parseName))
+
+        actual fun fromCommandLine(arg: String, cwd: String): File =
+            if (cwd.isEmpty()) File(g_file_new_for_commandline_arg(arg))
+            else File(g_file_new_for_commandline_arg_and_cwd(arg, cwd))
     }
 
     /**
@@ -94,9 +106,9 @@ actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
         return if (fileInfoPtr != null) FileInfo(fileInfoPtr) else null
     }
 
-    actual fun hash(): UInt = g_file_hash(gFilePtr)
+    actual override fun hashCode(): Int = g_file_hash(gFilePtr).toInt()
 
-    override fun equals(other: Any?): Boolean =
+    actual override fun equals(other: Any?): Boolean =
         if (other is File) g_file_equal(gFilePtr, other.gFilePtr) == TRUE else false
 
     override fun close() {

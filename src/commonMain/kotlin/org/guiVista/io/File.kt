@@ -35,6 +35,47 @@ expect class File {
     val parent: File?
 
     /**
+     * Exactly like [path] but caches the result via `g_object_set_qdata_full()`. This is useful for example in C
+     * applications, which mix g_file_* APIs with native ones. It also avoids an extra duplicated string when possible,
+     * so will be generally more efficient. This call does no blocking I/O.
+     *
+     * Returns a string containing the GFile's path, or *""* if no such path exists. The returned string is owned by
+     * [File].
+     */
+    val peekPath: String
+
+    /**
+     * Checks to see if the file is native to the platform. A native file is one expressed in the platform-native
+     * filename format, e.g. **"C:\Windows"** or **"/usr/bin/"**. This does not mean the file is local, as it might be
+     * on a locally mounted remote filesystem. On some systems non-native files may be available using the native
+     * filesystem via a userspace filesystem (FUSE). In these cases this call will return *false*, but [path] will
+     * still return a native path.
+     *
+     * This call does no blocking I/O.
+     */
+    val isNative: Boolean
+
+    /**
+     * Gets the URI scheme for a GFile. RFC 3986 decodes the scheme as:
+     * ```
+     * URI = scheme ":" hier-part [ "?" query ] [ "#" fragment ]
+     * ```
+     * Common schemes include *"file"*, *"http"*, *"ftp"*, etc. This call does no blocking I/O.
+     *
+     * Returns a String containing the URI scheme for the given [File]. The returned String should be freed with
+     * `g_free()` when no longer needed.
+     */
+    val uriScheme: String
+
+    /**
+     * Checks to see if the file has a given [URI scheme][uriScheme]. This call does no blocking I/O.
+     * @param uriScheme A string containing a URI scheme.
+     * @return A values of *true* if the file's backend supports the given [URI scheme][uriScheme], otherwise *false*
+     * if URI scheme is *null*, not supported, or [File] is invalid.
+     */
+    fun hasUriScheme(uriScheme: String): Boolean
+
+    /**
      * Checks if file has a parent, and optionally if it is parent. If parent is *null* then this function returns
      * *true*, if file has any parent at all. If parent is isn't null then *true* is only returned, if file is an
      * immediate child of parent.
@@ -96,7 +137,13 @@ expect class File {
      * [File] instance. This function is intended for easily hashing a [File] to add to a GHashTable, or similar data
      * structure.
      */
-    fun hash(): UInt
+    override fun hashCode(): Int
+
+    /**
+     * Checks if the two given files refer to the same file. Note that two files that differ can still refer to the
+     * same file on the filesystem due to various forms of filename aliasing. This call does no blocking I/O.
+     */
+    override fun equals(other: Any?): Boolean
 
     companion object {
         /**
@@ -124,5 +171,19 @@ expect class File {
          * @return A new [File] instance.
          */
         fun parseName(parseName: String): File
+
+        /**
+         * Constructs a [File] with the given argument from the command line. The value of [arg] can be either be a
+         * URI, an absolute path, or a relative path resolved relative to the current working directory. This operation
+         * never fails, but the returned object might not support any I/O operation if [arg] points to a malformed path.
+         *
+         * If [cwd] is specified then the current working directory is included instead of using the current working
+         * directory of the process. This function combines [g_file_new_for_commandline_arg](https://developer.gnome.org/gio/stable/GFile.html#g-file-new-for-commandline-arg),
+         * and [g_file_new_for_commandline_arg_and_cwd](https://developer.gnome.org/gio/stable/GFile.html#g-file-new-for-commandline-arg-and-cwd) functions into a single function.
+         * @param arg A command line String.
+         * @param cwd The current working directory to use.
+         * @return A new [File] instance.
+         */
+        fun fromCommandLine(arg: String, cwd: String = ""): File
     }
 }
