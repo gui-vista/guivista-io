@@ -4,10 +4,15 @@ import gio2.*
 import glib2.g_object_unref
 import kotlinx.cinterop.CPointer
 import org.guiVista.core.ObjectBase
+import org.guiVista.io.Icon
 
 /** User Notifications (pop up messages). */
 actual class Notification actual constructor(title: String) : ObjectBase {
     val gNotificationPtr: CPointer<GNotification>? = g_notification_new(title)
+
+    actual fun changeIcon(newIcon: Icon) {
+        g_notification_set_icon(gNotificationPtr, newIcon.gIconPtr)
+    }
 
     actual fun changeTitle(newTitle: String) {
         g_notification_set_title(gNotificationPtr, newTitle)

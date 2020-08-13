@@ -1,9 +1,16 @@
 package org.guiVista.io.application
 
 import org.guiVista.core.ObjectBase
+import org.guiVista.io.Icon
 
 /** User Notifications (pop up messages). */
 expect class Notification(title: String) : ObjectBase {
+    /**
+     * Sets the icon of [Notification] to the [new icon][newIcon].
+     * @param newIcon The new icon to use.
+     */
+    fun changeIcon(newIcon: Icon)
+
     /**
      * Sets the title of [Notification] to the [new title][newTitle].
      * @param newTitle The new title to use.
