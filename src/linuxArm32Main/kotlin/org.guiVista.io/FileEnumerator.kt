@@ -1,6 +1,7 @@
 package org.guiVista.io
 
 import gio2.*
+import glib2.FALSE
 import glib2.GError
 import glib2.TRUE
 import glib2.g_object_unref
@@ -12,15 +13,30 @@ actual class FileEnumerator(fileEnumeratorPtr: CPointer<GFileEnumerator>) : Clos
     private val arena = Arena()
     val gFileEnumeratorPtr: CPointer<GFileEnumerator>? = fileEnumeratorPtr
     private val closeErrorPtrVar = arena.alloc<CPointerVar<GError>>()
+    private val iterateErrorPtrVar = arena.alloc<CPointerVar<GError>>()
+    private val nextFileErrorPtrVar = arena.alloc<CPointerVar<GError>>()
+    actual val nextFileError: Error?
+        get() {
+            val tmp = nextFileErrorPtrVar.value
+            return if (tmp != null) Error.fromErrorPtr(tmp) else null
+        }
     actual val closeError: Error?
         get() {
             val tmp = closeErrorPtrVar.value
+            return if (tmp != null) Error.fromErrorPtr(tmp) else null
+        }
+    actual val iterateError: Error?
+        get() {
+            val tmp = iterateErrorPtrVar.value
             return if (tmp != null) Error.fromErrorPtr(tmp) else null
         }
     actual val isClosed: Boolean
         get() = g_file_enumerator_is_closed(gFileEnumeratorPtr) == TRUE
     actual val container: File
         get() = File.fromFilePtr(g_file_enumerator_get_container(gFileEnumeratorPtr))
+    actual var pendingOperations: Boolean
+        get() = g_file_enumerator_has_pending(gFileEnumeratorPtr) == TRUE
+        set(value) = g_file_enumerator_set_pending(gFileEnumeratorPtr, if (value) TRUE else FALSE)
 
     actual fun fetchChild(info: FileInfo): File =
         File.fromFilePtr(g_file_enumerator_get_child(gFileEnumeratorPtr, info.gFileInfoPtr))
@@ -37,7 +53,23 @@ actual class FileEnumerator(fileEnumeratorPtr: CPointer<GFileEnumerator>) : Clos
     }
 
     actual fun nextFile(): FileInfo? {
-        val tmp = g_file_enumerator_next_file(enumerator = gFileEnumeratorPtr, cancellable = null, error = null)
+        val tmp = g_file_enumerator_next_file(enumerator = gFileEnumeratorPtr, cancellable = null,
+            error = nextFileErrorPtrVar.ptr)
         return if (tmp != null) FileInfo(tmp) else null
     }
+
+    actual fun iterate(outInfo: Array<FileInfo>, outChild: File?): Boolean {
+        if (outInfo.isEmpty() && outChild == null) {
+            throw IllegalArgumentException("Must have a non null outChild, or outInfo that isn't empty.")
+        }
+        val rc = g_file_enumerator_iterate(
+            direnum = gFileEnumeratorPtr,
+            cancellable = null,
+            error = iterateErrorPtrVar.ptr,
+            out_child = cValuesOf(outChild?.gFilePtr),
+            out_info = outInfo.map { it.gFileInfoPtr }.toCValues()
+        )
+        return rc == TRUE
+    }
+
 }
