@@ -1,14 +1,14 @@
 # GUI Vista IO (guivista-io)
 
 A Kotlin Native library that provides Input/Output functionality. This library uses the 
-[GIO](https://developer.gnome.org/gio/stable/) library. **Warning** - This library depends on Kotlin Native which is 
-currently in beta, and doesn't provide any backwards compatibility guarantees! Currently, GUI Vista IO isn't 
-available in Maven Central or JCenter, but is available in a remote GitLab Maven repository.
+[GIO](https://developer.gnome.org/gio/stable/) library. **Warning** - This library depends on Kotlin Native (requires 
+Kotlin 1.4.0) which is currently in beta, and doesn't provide any backwards compatibility guarantees! Currently, GUI 
+Vista IO isn't available in Maven Central or JCenter, but is available in a remote Bintray Maven repository.
 
 
 ## Setup Gradle Build File
 
-In order to use the library with Gradle (version 5.4 or higher) do the following:
+In order to use the library with Gradle (version 6.0 or higher) do the following:
 
 1. Open/create a Kotlin Native project which targets **linuxX64** or **linuxArm32Hfp**
 2. Open the project's **build.gradle.kts** file
@@ -49,7 +49,7 @@ kotlin {
         // ...
         compilations.getByName("main") {
             dependencies {
-                val guiVistaVer = "0.1.2"
+                val guiVistaVer = "0.2.0"
                 cinterops.create("glib2")
                 cinterops.create("gio2")
                 implementation("org.guivista:guivista-io:$guiVistaVer")
