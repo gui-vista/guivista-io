@@ -1,7 +1,7 @@
 package org.guiVista.io
 
 /** File and Directory Handling. */
-expect class File {
+public expect class File {
     /**
      * Gets the base name (the last component of the path) for a given [File]. If called for the top level of a system
      * (such as the filesystem root, or a uri like sftp://host/ it will return a single directory separator (and on
@@ -13,7 +13,7 @@ expect class File {
      * No blocking I/O is done with the property. This property will return the [file's][File] base name, or *""* (an
      * empty String) if the [File] instance is invalid.
      */
-    val baseName: String
+    public val baseName: String
 
     /**
      * Gets the local pathname for [File] instance if one exists. If it isn't empty then this is guaranteed to be an
@@ -21,10 +21,10 @@ expect class File {
      *
      * This property will return the [file's][File] path, or *""* (an empty String) if no such path exists.
      */
-    val path: String
+    public val path: String
 
     /** Gets the URI for the file. No blocking I/O is done with the property. */
-    val uri: String
+    public val uri: String
 
     /**
      * Gets the parent directory for the file. If the file represents the root directory of the file system, then
@@ -32,7 +32,7 @@ expect class File {
      *
      * Returns a [File] instance to the parent of the given [File], or *null* if there is no parent.
      */
-    val parent: File?
+    public val parent: File?
 
     /**
      * Exactly like [path] but caches the result via `g_object_set_qdata_full()`. This is useful for example in C
@@ -42,7 +42,7 @@ expect class File {
      * Returns a string containing the GFile's path, or *""* if no such path exists. The returned string is owned by
      * [File].
      */
-    val peekPath: String
+    public val peekPath: String
 
     /**
      * Checks to see if the file is native to the platform. A native file is one expressed in the platform-native
@@ -53,7 +53,7 @@ expect class File {
      *
      * This call does no blocking I/O.
      */
-    val isNative: Boolean
+    public val isNative: Boolean
 
     /**
      * Gets the URI scheme for a GFile. RFC 3986 decodes the scheme as:
@@ -65,7 +65,7 @@ expect class File {
      * Returns a String containing the URI scheme for the given [File]. The returned String should be freed with
      * `g_free()` when no longer needed.
      */
-    val uriScheme: String
+    public val uriScheme: String
 
     /**
      * Checks to see if the file has a given [URI scheme][uriScheme]. This call does no blocking I/O.
@@ -73,14 +73,14 @@ expect class File {
      * @return A values of *true* if the file's backend supports the given [URI scheme][uriScheme], otherwise *false*
      * if URI scheme is *null*, not supported, or [File] is invalid.
      */
-    fun hasUriScheme(uriScheme: String): Boolean
+    public fun hasUriScheme(uriScheme: String): Boolean
 
     /**
      * Checks if file has a parent, and optionally if it is parent. If parent is *null* then this function returns
      * *true*, if file has any parent at all. If parent is isn't null then *true* is only returned, if file is an
      * immediate child of parent.
      */
-    fun hasParent(parent: File): Boolean
+    public fun hasParent(parent: File): Boolean
 
     /**
      * Gets a child of file with [base name][baseName] equal to [name]. Note that the file with that specific name might not
@@ -89,7 +89,7 @@ expect class File {
      * @param name The child's base name.
      * @return A [File] to a child specified by [name].
      */
-    fun fetchChild(name: String): File
+    public fun fetchChild(name: String): File
 
     /**
      * Checks whether file has the prefix specified by prefix. In other words if the names of initial elements of
@@ -102,7 +102,7 @@ expect class File {
      * @param prefix Input [file][File].
      * @return If the files's parent, grandparent, etc is prefix then *true*, otherwise *false*.
      */
-    fun hasPrefix(prefix: File): Boolean
+    public fun hasPrefix(prefix: File): Boolean
 
     /**
      * Gets the parse name of the file. A parse name is a UTF-8 string that describes the file. This is generally used
@@ -113,7 +113,7 @@ expect class File {
      * This function doesn't do any blocking I/O.
      * @return A String containing the [file's][File] parse name.
      */
-    fun fetchParseName(): String
+    public fun fetchParseName(): String
 
     /**
      * Gets the path for [descendant] relative to parent (this [File] instance). This function doesn't do any blocking
@@ -122,14 +122,14 @@ expect class File {
      * @return The relative path from [descendant] to parent, or *""* (an empty String) if [descendant] doesn't have a
      * parent as prefix.
      */
-    fun fetchRelativePath(descendant: File): String
+    public fun fetchRelativePath(descendant: File): String
 
     /**
      * Resolves a relative path for [File] instance to an absolute path. This function doesn't do any blocking I/O.
      * @param relativePath Input [file][File].
      * @return A [File] instance to the resolved path, or *null* if [relativePath] is *null*, or if file is invalid.
      */
-    fun resolveRelativePath(relativePath: String): File?
+    public fun resolveRelativePath(relativePath: String): File?
 
     /**
      * Creates a hash value for the [File] instance. This function doesn't do any blocking I/O.
@@ -145,7 +145,7 @@ expect class File {
      */
     override fun equals(other: Any?): Boolean
 
-    companion object {
+    public companion object {
         /**
          * Constructs a [File] for a given path. This operation never fails, but the returned object might not support
          * any I/O operation **if** path is malformed.
@@ -153,7 +153,7 @@ expect class File {
          * filename encoding.
          * @return A new [File] for the given path.
          */
-        fun fromPath(path: String): File
+        public fun fromPath(path: String): File
 
         /**
          * Constructs a [File] for a given URI. This operation never fails, but the returned object might not support
@@ -161,7 +161,7 @@ expect class File {
          * @param uri A UTF-8 encoded String containing a URI.
          * @return A new [File] for the given uri.
          */
-        fun fromUri(uri: String): File
+        public fun fromUri(uri: String): File
 
         /**
          * Constructs a [File] with the given [parseName] (i.e. something given by `g_file_get_parse_name()`). This
@@ -170,7 +170,7 @@ expect class File {
          * @param parseName A file name, or path to be parsed.
          * @return A new [File] instance.
          */
-        fun parseName(parseName: String): File
+        public fun parseName(parseName: String): File
 
         /**
          * Constructs a [File] with the given argument from the command line. The value of [arg] can be either be a
@@ -184,6 +184,6 @@ expect class File {
          * @param cwd The current working directory to use.
          * @return A new [File] instance.
          */
-        fun fromCommandLine(arg: String, cwd: String = ""): File
+        public fun fromCommandLine(arg: String, cwd: String = ""): File
     }
 }

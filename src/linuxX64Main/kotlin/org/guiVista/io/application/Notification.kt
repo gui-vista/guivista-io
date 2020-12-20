@@ -7,18 +7,18 @@ import org.guiVista.core.ObjectBase
 import org.guiVista.io.Icon
 
 /** User Notifications (pop up messages). */
-actual class Notification actual constructor(title: String) : ObjectBase {
-    val gNotificationPtr: CPointer<GNotification>? = g_notification_new(title)
+public actual class Notification actual constructor(title: String) : ObjectBase {
+    public val gNotificationPtr: CPointer<GNotification>? = g_notification_new(title)
 
-    actual fun changeIcon(newIcon: Icon) {
+    public actual fun changeIcon(newIcon: Icon) {
         g_notification_set_icon(gNotificationPtr, newIcon.gIconPtr)
     }
 
-    actual fun changeTitle(newTitle: String) {
+    public actual fun changeTitle(newTitle: String) {
         g_notification_set_title(gNotificationPtr, newTitle)
     }
 
-    actual fun changeBody(newBody: String) {
+    public actual fun changeBody(newBody: String) {
         g_notification_set_body(gNotificationPtr, newBody)
     }
 
@@ -27,15 +27,15 @@ actual class Notification actual constructor(title: String) : ObjectBase {
      * values.
      * @param newPriority The new priority to use.
      */
-    fun changeIcon(newPriority: GNotificationPriority) {
+    public fun changeIcon(newPriority: GNotificationPriority) {
         g_notification_set_priority(gNotificationPtr, newPriority)
     }
 
-    actual fun changeDefaultAction(detailedAction: String) {
+    public actual fun changeDefaultAction(detailedAction: String) {
         g_notification_set_default_action(gNotificationPtr, detailedAction)
     }
 
-    actual fun addButton(label: String, detailedAction: String) {
+    public actual fun addButton(label: String, detailedAction: String) {
         g_notification_add_button(notification = gNotificationPtr, label = label, detailed_action = detailedAction)
     }
 

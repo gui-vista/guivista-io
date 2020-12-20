@@ -5,14 +5,14 @@ import glib2.TRUE
 import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.toKString
 
-actual class Icon private constructor(iconPtr: CPointer<GIcon>?) : IconBase {
-    val gIconPtr: CPointer<GIcon>? = iconPtr
+public actual class Icon private constructor(iconPtr: CPointer<GIcon>?) : IconBase {
+    public val gIconPtr: CPointer<GIcon>? = iconPtr
 
-    actual companion object {
+    public actual companion object {
         /** Creates a new [Icon] instance from a iconPtr. */
-        fun fromIconPtr(iconPtr: CPointer<GIcon>?): Icon = Icon(iconPtr)
+        public fun fromIconPtr(iconPtr: CPointer<GIcon>?): Icon = Icon(iconPtr)
 
-        actual fun fromString(str: String): Icon = Icon(g_icon_new_for_string(str, null))
+        public actual fun fromString(str: String): Icon = Icon(g_icon_new_for_string(str, null))
     }
 
     actual override fun equals(other: Any?): Boolean =

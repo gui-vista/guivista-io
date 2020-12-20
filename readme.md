@@ -2,7 +2,7 @@
 
 A Kotlin Native library that provides Input/Output functionality. This library uses the 
 [GIO](https://developer.gnome.org/gio/stable/) library. **Warning** - This library depends on Kotlin Native (requires 
-Kotlin 1.4.0) which is currently in beta, and doesn't provide any backwards compatibility guarantees! Currently, GUI 
+Kotlin 1.4.21) which is currently in beta, and doesn't provide any backwards compatibility guarantees! Currently, GUI 
 Vista IO isn't available in Maven Central or JCenter, but is available in a remote Bintray Maven repository.
 
 

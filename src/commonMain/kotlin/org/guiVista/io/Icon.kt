@@ -1,8 +1,8 @@
 package org.guiVista.io
 
 /** Represents an icon. */
-expect class Icon : IconBase {
-    companion object {
+public expect class Icon : IconBase {
+    public companion object {
         /**
          * Generate a [Icon] instance from [str]. This function can fail if [str] isn't valid. If your application, or
          * library provides one or more [Icon] implementations then you need to ensure that each `GType` is registered
@@ -11,7 +11,7 @@ expect class Icon : IconBase {
          * @return A instance of [Icon].
          * @see toString
          */
-        fun fromString(str: String): Icon
+        public fun fromString(str: String): Icon
     }
 
     /**

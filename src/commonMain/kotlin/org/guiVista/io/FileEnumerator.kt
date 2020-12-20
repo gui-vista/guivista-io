@@ -3,17 +3,17 @@ package org.guiVista.io
 import org.guiVista.core.Closable
 import org.guiVista.core.Error
 
-expect class FileEnumerator : Closable {
-    val closeError: Error?
-    val iterateError: Error?
-    val nextFileError: Error?
-    val isClosed: Boolean
+public expect class FileEnumerator : Closable {
+    public val closeError: Error?
+    public val iterateError: Error?
+    public val nextFileError: Error?
+    public val isClosed: Boolean
 
     /** The [File] container which is being enumerated. */
-    val container: File
+    public val container: File
 
     /** Indicates if there are pending operations for the enumerator. */
-    var pendingOperations: Boolean
+    public var pendingOperations: Boolean
 
     /**
      * Fetches a new [File] which refers to the file named by info in the source directory of enumerator. This
@@ -21,7 +21,7 @@ expect class FileEnumerator : Closable {
      * @param info A [FileInfo] fetched from [nextFile], or the async equivalents.
      * @return A [File] for the [FileInfo] passed it.
      */
-    fun fetchChild(info: FileInfo): File
+    public fun fetchChild(info: FileInfo): File
 
     /**
      * Returns information for the next file in the enumerated object. Will block until the information is available.
@@ -31,7 +31,7 @@ expect class FileEnumerator : Closable {
      * *null* will be returned, and error will be unset.
      * @return A [FileInfo] instance, or *null* on error, or end of enumerator.
      */
-    fun nextFile(): FileInfo?
+    public fun nextFile(): FileInfo?
 
     /**
      * This is a version of [nextFile] that's easier to use correctly from Kotlin programs. With [nextFile] the return
@@ -46,5 +46,5 @@ expect class FileEnumerator : Closable {
      *
      * You **MUST** specify at least one of [outInfo] or [outChild].
      */
-    fun iterate(outInfo: Array<FileInfo>, outChild: File?): Boolean
+    public fun iterate(outInfo: Array<FileInfo>, outChild: File?): Boolean
 }

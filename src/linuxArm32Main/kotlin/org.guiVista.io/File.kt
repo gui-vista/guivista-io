@@ -10,55 +10,55 @@ import org.guiVista.core.Closable
 import org.guiVista.core.Error
 
 @Suppress("EqualsOrHashCode")
-actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
-    val gFilePtr: CPointer<GFile>? = filePtr
-    actual val baseName: String
+public actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
+    public val gFilePtr: CPointer<GFile>? = filePtr
+    public actual val baseName: String
         get() = g_file_get_basename(gFilePtr)?.toKString() ?: ""
-    actual val path: String
+    public actual val path: String
         get() = g_file_get_path(gFilePtr)?.toKString() ?: ""
-    actual val uri: String
+    public actual val uri: String
         get() = g_file_get_uri(gFilePtr)?.toKString() ?: ""
-    actual val parent: File?
+    public actual val parent: File?
         get() {
             val tmp = g_file_get_parent(gFilePtr)
             return if (tmp != null) File(tmp) else null
         }
-    actual val peekPath: String
+    public actual val peekPath: String
         get() = g_file_peek_path(gFilePtr)?.toKString() ?: ""
-    actual val isNative: Boolean
+    public actual val isNative: Boolean
         get() = g_file_is_native(gFilePtr) == TRUE
-    actual val uriScheme: String
+    public actual val uriScheme: String
         get() = g_file_get_uri_scheme(gFilePtr)?.toKString() ?: ""
 
-    actual fun hasParent(parent: File): Boolean = g_file_has_parent(gFilePtr, parent.gFilePtr) == TRUE
+    public actual fun hasParent(parent: File): Boolean = g_file_has_parent(gFilePtr, parent.gFilePtr) == TRUE
 
-    actual fun fetchChild(name: String): File = File(g_file_get_child(gFilePtr, name))
+    public actual fun fetchChild(name: String): File = File(g_file_get_child(gFilePtr, name))
 
-    actual fun hasPrefix(prefix: File): Boolean = g_file_has_prefix(gFilePtr, prefix.gFilePtr) == TRUE
+    public actual fun hasPrefix(prefix: File): Boolean = g_file_has_prefix(gFilePtr, prefix.gFilePtr) == TRUE
 
-    actual fun fetchParseName(): String = g_file_get_parse_name(gFilePtr)?.toKString() ?: ""
+    public actual fun fetchParseName(): String = g_file_get_parse_name(gFilePtr)?.toKString() ?: ""
 
-    actual fun fetchRelativePath(descendant: File): String =
+    public actual fun fetchRelativePath(descendant: File): String =
         g_file_get_relative_path(gFilePtr, descendant.gFilePtr)?.toKString() ?: ""
 
-    actual fun resolveRelativePath(relativePath: String): File? {
+    public actual fun resolveRelativePath(relativePath: String): File? {
         val tmp = g_file_resolve_relative_path(gFilePtr, relativePath)
         return if (tmp != null) File(tmp) else null
     }
 
-    actual fun hasUriScheme(uriScheme: String): Boolean = g_file_has_uri_scheme(gFilePtr, uriScheme) == TRUE
+    public actual fun hasUriScheme(uriScheme: String): Boolean = g_file_has_uri_scheme(gFilePtr, uriScheme) == TRUE
 
-    actual companion object {
+    public actual companion object {
         /** Creates a new [File] instance from a filePtr. */
-        fun fromFilePtr(filePtr: CPointer<GFile>?): File = File(filePtr)
+        public fun fromFilePtr(filePtr: CPointer<GFile>?): File = File(filePtr)
 
-        actual fun fromPath(path: String): File = File(g_file_new_for_path(path))
+        public actual fun fromPath(path: String): File = File(g_file_new_for_path(path))
 
-        actual fun fromUri(uri: String): File = File(g_file_new_for_uri(uri))
+        public actual fun fromUri(uri: String): File = File(g_file_new_for_uri(uri))
 
-        actual fun parseName(parseName: String): File = File(g_file_parse_name(parseName))
+        public actual fun parseName(parseName: String): File = File(g_file_parse_name(parseName))
 
-        actual fun fromCommandLine(arg: String, cwd: String): File =
+        public actual fun fromCommandLine(arg: String, cwd: String): File =
             if (cwd.isEmpty()) File(g_file_new_for_commandline_arg(arg))
             else File(g_file_new_for_commandline_arg_and_cwd(arg, cwd))
     }
@@ -69,7 +69,7 @@ actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
      * @param flags A set of GFileQueryInfoFlags.
      * @return The GFileType of the [File], and *G_FILE_TYPE_UNKNOWN* if the file doesn't exist.
      */
-    fun queryFileType(flags: GFileQueryInfoFlags): GFileType =
+    public fun queryFileType(flags: GFileQueryInfoFlags): GFileType =
         g_file_query_file_type(file = gFilePtr, cancellable = null, flags = flags)
 
     /**
@@ -95,7 +95,7 @@ actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
      * @param error The [Error] instance to use for storing error information.
      * @return A [FileInfo] instance, or *null* if a error has occurred.
      */
-    fun queryInfo(attributes: String, flags: GFileQueryInfoFlags, error: Error): FileInfo? {
+    public fun queryInfo(attributes: String, flags: GFileQueryInfoFlags, error: Error): FileInfo? {
         val fileInfoPtr = g_file_query_info(
             file = gFilePtr,
             attributes = attributes,
@@ -132,7 +132,7 @@ actual class File private constructor(filePtr: CPointer<GFile>?) : Closable {
      * @param flags A set of GFileQueryInfoFlags.
      * @return A [FileEnumerator] if successful, *null* on error.
      */
-    fun enumerateChildren(attributes: String, flags: GAppInfoCreateFlags): FileEnumerator? {
+    public fun enumerateChildren(attributes: String, flags: GAppInfoCreateFlags): FileEnumerator? {
         val tmp = g_file_enumerate_children(
             file = gFilePtr,
             attributes = attributes,

@@ -9,36 +9,36 @@ import kotlinx.cinterop.*
 import org.guiVista.core.Closable
 import org.guiVista.core.Error
 
-actual class FileEnumerator(fileEnumeratorPtr: CPointer<GFileEnumerator>) : Closable {
+public actual class FileEnumerator(fileEnumeratorPtr: CPointer<GFileEnumerator>) : Closable {
     private val arena = Arena()
-    val gFileEnumeratorPtr: CPointer<GFileEnumerator>? = fileEnumeratorPtr
+    public val gFileEnumeratorPtr: CPointer<GFileEnumerator> = fileEnumeratorPtr
     private val closeErrorPtrVar = arena.alloc<CPointerVar<GError>>()
     private val iterateErrorPtrVar = arena.alloc<CPointerVar<GError>>()
     private val nextFileErrorPtrVar = arena.alloc<CPointerVar<GError>>()
-    actual val nextFileError: Error?
+    public actual val nextFileError: Error?
         get() {
             val tmp = nextFileErrorPtrVar.value
             return if (tmp != null) Error.fromErrorPtr(tmp) else null
         }
-    actual val closeError: Error?
+    public actual val closeError: Error?
         get() {
             val tmp = closeErrorPtrVar.value
             return if (tmp != null) Error.fromErrorPtr(tmp) else null
         }
-    actual val iterateError: Error?
+    public actual val iterateError: Error?
         get() {
             val tmp = iterateErrorPtrVar.value
             return if (tmp != null) Error.fromErrorPtr(tmp) else null
         }
-    actual val isClosed: Boolean
+    public actual val isClosed: Boolean
         get() = g_file_enumerator_is_closed(gFileEnumeratorPtr) == TRUE
-    actual val container: File
+    public actual val container: File
         get() = File.fromFilePtr(g_file_enumerator_get_container(gFileEnumeratorPtr))
-    actual var pendingOperations: Boolean
+    public actual var pendingOperations: Boolean
         get() = g_file_enumerator_has_pending(gFileEnumeratorPtr) == TRUE
         set(value) = g_file_enumerator_set_pending(gFileEnumeratorPtr, if (value) TRUE else FALSE)
 
-    actual fun fetchChild(info: FileInfo): File =
+    public actual fun fetchChild(info: FileInfo): File =
         File.fromFilePtr(g_file_enumerator_get_child(gFileEnumeratorPtr, info.gFileInfoPtr))
 
     /**
@@ -52,13 +52,13 @@ actual class FileEnumerator(fileEnumeratorPtr: CPointer<GFileEnumerator>) : Clos
         arena.clear()
     }
 
-    actual fun nextFile(): FileInfo? {
+    public actual fun nextFile(): FileInfo? {
         val tmp = g_file_enumerator_next_file(enumerator = gFileEnumeratorPtr, cancellable = null,
             error = nextFileErrorPtrVar.ptr)
         return if (tmp != null) FileInfo(tmp) else null
     }
 
-    actual fun iterate(outInfo: Array<FileInfo>, outChild: File?): Boolean {
+    public actual fun iterate(outInfo: Array<FileInfo>, outChild: File?): Boolean {
         if (outInfo.isEmpty() && outChild == null) {
             throw IllegalArgumentException("Must have a non null outChild, or outInfo that isn't empty.")
         }

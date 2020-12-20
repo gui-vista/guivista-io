@@ -8,7 +8,7 @@ group = "org.guivista"
 version = if (projectSettings.isDevVer) "${projectSettings.libVer}-dev" else projectSettings.libVer
 
 plugins {
-    kotlin("multiplatform") version "1.4.0"
+    kotlin("multiplatform") version "1.4.21"
     `maven-publish`
 }
 
@@ -16,15 +16,18 @@ repositories {
     jcenter()
     mavenCentral()
     maven {
-        url = uri("https://dl.bintray.com/guivista/public")
+        val repo = if (!projectSettings.isDevVer) "public" else "development"
+        url = uri("https://dl.bintray.com/guivista/$repo")
     }
 }
 
 kotlin {
+    val guiVistaVer = if (!projectSettings.isDevVer) projectSettings.libVer else "${projectSettings.libVer}-dev"
+    explicitApi()
     linuxX64("linuxX64") {
         compilations.getByName("main") {
             dependencies {
-                implementation("org.guivista:guivista-core-linuxx64:${projectSettings.libVer}")
+                implementation("org.guivista:guivista-core-linuxx64:$guiVistaVer")
             }
             cinterops.create("gio2") {
                 includeDirs("/usr/include/glib-2.0/gio")
@@ -35,7 +38,7 @@ kotlin {
     linuxArm32Hfp("linuxArm32") {
         compilations.getByName("main") {
             dependencies {
-                implementation("org.guivista:guivista-core-linuxarm32:${projectSettings.libVer}")
+                implementation("org.guivista:guivista-core-linuxarm32:$guiVistaVer")
             }
             cinterops.create("gio2") {
                 includeDirs("/mnt/pi_image/usr/include/glib-2.0/gio")
@@ -50,9 +53,9 @@ kotlin {
         val commonMain by getting {
             languageSettings.useExperimentalAnnotation(unsignedTypes)
             dependencies {
-                val kotlinVer = "1.4.0"
+                val kotlinVer = "1.4.21"
                 implementation(kotlin("stdlib-common", kotlinVer))
-                implementation("org.guivista:guivista-core:${projectSettings.libVer}")
+                implementation("org.guivista:guivista-core:$guiVistaVer")
             }
         }
 

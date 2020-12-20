@@ -4,24 +4,24 @@ import org.guiVista.core.ObjectBase
 import org.guiVista.io.Icon
 
 /** User Notifications (pop up messages). */
-expect class Notification(title: String) : ObjectBase {
+public expect class Notification(title: String) : ObjectBase {
     /**
      * Sets the icon of [Notification] to the [new icon][newIcon].
      * @param newIcon The new icon to use.
      */
-    fun changeIcon(newIcon: Icon)
+    public fun changeIcon(newIcon: Icon)
 
     /**
      * Sets the title of [Notification] to the [new title][newTitle].
      * @param newTitle The new title to use.
      */
-    fun changeTitle(newTitle: String)
+    public fun changeTitle(newTitle: String)
 
     /**
      * Sets the body of [Notification] to the [new body][newBody].
      * @param newBody The new body to use.
      */
-    fun changeBody(newBody: String)
+    public fun changeBody(newBody: String)
 
     /**
      * Sets the default action of [Notification] to [detailedAction]. This action is activated when the [Notification]
@@ -32,7 +32,7 @@ expect class Notification(title: String) : ObjectBase {
      * When no default action is set the [application][ApplicationBase] that the notification was sent on is activated.
      * @param detailedAction A detailed action name.
      */
-    fun changeDefaultAction(detailedAction: String)
+    public fun changeDefaultAction(detailedAction: String)
 
     /**
      * Adds a button to [Notification] that activates the action in [detailedAction] when clicked. That action **must**
@@ -42,5 +42,5 @@ expect class Notification(title: String) : ObjectBase {
      * @param label Label of the button.
      * @param detailedAction A detailed action name.
      */
-    fun addButton(label: String, detailedAction: String)
+    public fun addButton(label: String, detailedAction: String)
 }

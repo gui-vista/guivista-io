@@ -15,35 +15,36 @@ private const val STARTUP_SIGNAL = "startup"
 private const val SHUTDOWN_SIGNAL = "shutdown"
 private const val OPEN_SIGNAL = "open"
 
-actual interface ApplicationBase : ObjectBase {
-    val gApplicationPtr: CPointer<GApplication>?
+public actual interface ApplicationBase : ObjectBase {
+    public val gApplicationPtr: CPointer<GApplication>?
 
     /** The unique identifier for the application. Default value is *""* (an empty String). */
-    val appId: String
+    public val appId: String
         get() = g_application_get_application_id(gApplicationPtr)?.toKString() ?: ""
 
     /** Time (in ms) to stay alive after becoming idle. Default value is *0*. */
-    var inactivityTimeout: UInt
+    public var inactivityTimeout: UInt
         get() = g_application_get_inactivity_timeout(gApplicationPtr)
         set(value) = g_application_set_inactivity_timeout(gApplicationPtr, value)
 
     /** The base resource path for the application. Default value is *""* (an empty String). */
-    var resourceBasePath: String
+    public var resourceBasePath: String
         get() = g_application_get_resource_base_path(gApplicationPtr)?.toKString() ?: ""
         set(value) = g_application_set_resource_base_path(gApplicationPtr, value)
+
     /**
      * Whether the application is currently marked as busy through `g_application_mark_busy()`, or
      * `g_application_bind_busy_property()`. Default value is *false*.
      */
-    val isBusy: Boolean
+    public val isBusy: Boolean
         get() = g_application_get_is_busy(gApplicationPtr) == TRUE
 
     /** If `g_application_register()` has been called. Default value is *false*. */
-    val isRegistered: Boolean
+    public val isRegistered: Boolean
         get() = g_application_get_is_registered(gApplicationPtr) == TRUE
 
     /** If this application instance is remote. Default value is *false*. */
-    val isRemote: Boolean
+    public val isRemote: Boolean
         get() = g_application_get_is_remote(gApplicationPtr) == TRUE
 
     /**
@@ -51,7 +52,7 @@ actual interface ApplicationBase : ObjectBase {
      * continue to run. For example, [hold] is called by GTK+ when a top level window is on the screen. To cancel the
      * hold call [release].
      */
-    fun hold() {
+    public fun hold() {
         g_application_hold(gApplicationPtr)
     }
 
@@ -59,7 +60,7 @@ actual interface ApplicationBase : ObjectBase {
      * Decrease the use count of the application. When the use count reaches *0* the application will stop running.
      * **Never** call this function except to cancel the effect of a previous call to [hold].
      */
-    fun release() {
+    public fun release() {
         g_application_release(gApplicationPtr)
     }
 
@@ -71,7 +72,7 @@ actual interface ApplicationBase : ObjectBase {
      *
      * The result of calling [run] again after it returns is unspecified.
      */
-    fun quit() {
+    public fun quit() {
         g_application_quit(gApplicationPtr)
     }
 
@@ -86,7 +87,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param files An array of files to open.
      * @param hint The hint to use.
      */
-    fun open(files: Array<File>, hint: String = "") {
+    public fun open(files: Array<File>, hint: String = "") {
         if (files.isEmpty()) throw IllegalArgumentException("The files parameter cannot be empty.")
         val tmp = files.map { it.gFilePtr }.toTypedArray()
         g_application_open(application = gApplicationPtr, files = cValuesOf(*tmp), n_files = files.size, hint = hint)
@@ -99,7 +100,7 @@ actual interface ApplicationBase : ObjectBase {
      *
      * To cancel the busy indication use [unmarkBusy].
      */
-    fun markBusy() {
+    public fun markBusy() {
         g_application_mark_busy(gApplicationPtr)
     }
 
@@ -107,7 +108,7 @@ actual interface ApplicationBase : ObjectBase {
      * Decreases the busy count of the application. When the busy count reaches *0* the new state will be propagated to
      * other processes. This function **MUST** only be called to cancel the effect of a previous call to [markBusy].
      */
-    fun unmarkBusy() {
+    public fun unmarkBusy() {
         g_application_unmark_busy(gApplicationPtr)
     }
 
@@ -118,7 +119,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param userData User data to pass through to the [slot].
      * @return The handler ID.
      */
-    fun connectActivateSignal(slot: CPointer<ActivateSlot>, userData: gpointer): ULong =
+    public fun connectActivateSignal(slot: CPointer<ActivateSlot>, userData: gpointer): ULong =
         connectGSignal(obj = gApplicationPtr, signal = ACTIVATE_SIGNAL, slot = slot, data = userData)
 
     /**
@@ -128,7 +129,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param userData User data to pass through to the [slot].
      * @return The handler ID.
      */
-    fun connectStartupSignal(slot: CPointer<StartupSlot>, userData: gpointer): ULong =
+    public fun connectStartupSignal(slot: CPointer<StartupSlot>, userData: gpointer): ULong =
         connectGSignal(obj = gApplicationPtr, signal = STARTUP_SIGNAL, slot = slot, data = userData)
 
     /**
@@ -138,7 +139,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param userData User data to pass through to the [slot].
      * @return The handler ID.
      */
-    fun connectShutdownSignal(slot: CPointer<ShutdownSlot>, userData: gpointer): ULong =
+    public fun connectShutdownSignal(slot: CPointer<ShutdownSlot>, userData: gpointer): ULong =
         connectGSignal(obj = gApplicationPtr, signal = SHUTDOWN_SIGNAL, slot = slot, data = userData)
 
     /**
@@ -148,7 +149,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param userData User data to pass through to the [slot].
      * @return The handler ID.
      */
-    fun connectOpenSignal(slot: CPointer<OpenSlot>, userData: gpointer): ULong =
+    public fun connectOpenSignal(slot: CPointer<OpenSlot>, userData: gpointer): ULong =
         connectGSignal(obj = gApplicationPtr, signal = OPEN_SIGNAL, slot = slot, data = userData)
 
     /**
@@ -156,7 +157,7 @@ actual interface ApplicationBase : ObjectBase {
      * @return A status code is returned when the application exits. Any code not equal to *0* means a error has
      * occurred.
      */
-    fun run(): Int = g_application_run(gApplicationPtr, 0, null)
+    public fun run(): Int = g_application_run(gApplicationPtr, 0, null)
 
     override fun disconnectSignal(handlerId: ULong) {
         super.disconnectSignal(handlerId)
@@ -180,7 +181,7 @@ actual interface ApplicationBase : ObjectBase {
      * @param id The ID of the [application][ApplicationBase], or *""* (an empty String).
      * @param notification The notification to send.
      */
-    fun sendNotification(id: String = "", notification: Notification) {
+    public fun sendNotification(id: String = "", notification: Notification) {
         g_application_send_notification(application = gApplicationPtr, id = id,
             notification = notification.gNotificationPtr)
     }
@@ -195,7 +196,7 @@ actual interface ApplicationBase : ObjectBase {
      * its default action, so there is no need to explicitly withdraw the notification in that case.
      * @param id The ID of the previously sent notification..
      */
-    fun withdrawNotification(id: String) {
+    public fun withdrawNotification(id: String) {
         g_application_withdraw_notification(gApplicationPtr, id)
     }
 
@@ -209,21 +210,21 @@ actual interface ApplicationBase : ObjectBase {
  * 1. application: CPointer<GApplication>
  * 2. userData: gpointer
  */
-typealias ActivateSlot = CFunction<(application: CPointer<GApplication>, userData: gpointer) -> Unit>
+public typealias ActivateSlot = CFunction<(application: CPointer<GApplication>, userData: gpointer) -> Unit>
 
 /**
  * The event handler for the *startup* signal. Arguments:
  * 1. application: CPointer<GApplication>
  * 2. userData: gpointer
  */
-typealias StartupSlot = CFunction<(application: CPointer<GApplication>, userData: gpointer) -> Unit>
+public typealias StartupSlot = CFunction<(application: CPointer<GApplication>, userData: gpointer) -> Unit>
 
 /**
  * The event handler for the *shutdown* signal. Arguments:
  * 1. application: CPointer<GApplication>
  * 2. userData: gpointer
  */
-typealias ShutdownSlot = CFunction<(application: CPointer<GApplication>, userData: gpointer) -> Unit>
+public typealias ShutdownSlot = CFunction<(application: CPointer<GApplication>, userData: gpointer) -> Unit>
 
 /**
  * The event handler for the *open* signal that occurs when there are files to open. Arguments:
@@ -233,7 +234,7 @@ typealias ShutdownSlot = CFunction<(application: CPointer<GApplication>, userDat
  * 4. hint: CPointer<ByteVar>
  * 5. userData: gpointer
  */
-typealias OpenSlot = CFunction<(
+public typealias OpenSlot = CFunction<(
     application: CPointer<GApplication>,
     files: gpointer,
     totalFiles: Int,
