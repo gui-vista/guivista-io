@@ -9,14 +9,17 @@ import org.guiVista.core.ObjectBase
 import org.guiVista.core.connectGSignal
 import org.guiVista.core.disconnectGSignal
 import org.guiVista.io.File
+import org.guiVista.io.application.action.ActionMap
 
 private const val ACTIVATE_SIGNAL = "activate"
 private const val STARTUP_SIGNAL = "startup"
 private const val SHUTDOWN_SIGNAL = "shutdown"
 private const val OPEN_SIGNAL = "open"
 
-public actual interface ApplicationBase : ObjectBase {
+public actual interface ApplicationBase : ActionMap, ObjectBase {
     public val gApplicationPtr: CPointer<GApplication>?
+    override val gActionMapPtr: CPointer<GActionMap>?
+        get() = gApplicationPtr?.reinterpret()
 
     /** The unique identifier for the application. Default value is *""* (an empty String). */
     public val appId: String
