@@ -157,7 +157,7 @@ public actual interface ApplicationBase : ObjectBase {
      * @return A status code is returned when the application exits. Any code not equal to *0* means a error has
      * occurred.
      */
-    public fun run(): Int = g_application_run(gApplicationPtr, 0, null)
+    public fun run(): Int = g_application_run(application = gApplicationPtr, argc = 0, argv = null)
 
     override fun disconnectSignal(handlerId: ULong) {
         super.disconnectSignal(handlerId)
@@ -202,6 +202,24 @@ public actual interface ApplicationBase : ObjectBase {
 
     override fun close() {
         g_object_unref(gApplicationPtr)
+    }
+
+    public companion object {
+        /**
+         * Checks if [id] is a valid application identifier. A valid ID is required for calls to
+         * `Application()`, and [appId]. All application identifiers follow the same
+         * format as D-Bus well-known bus names. For convenience the restrictions on application identifiers are
+         * reproduced here:
+         *
+         * - Application identifiers are composed of 1 or more elements separated by a period (.) character. All elements must contain at least one character.
+         * - Each element must only contain the ASCII characters [A-Z][a-z][0-9]_-, with - discouraged in new application identifiers. Each element must not begin with a digit.
+         * - Application identifiers must contain at least one . (period) character (and thus at least two elements).
+         * - Application identifiers must not begin with a . (period) character.
+         * - Application identifiers must not exceed 255 characters.
+         * @param id A potential application identifier.
+         * @return A value of *true* if [id] is valid.
+         */
+        public fun validAppId(id: String): Boolean = g_application_id_is_valid(id) == TRUE
     }
 }
 
