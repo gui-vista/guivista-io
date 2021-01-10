@@ -7,6 +7,7 @@ import glib2.g_free
 import glib2.g_object_unref
 import kotlinx.cinterop.*
 import org.guiVista.core.Closable
+import org.guiVista.io.icon.Icon
 
 public actual class FileInfo(fileInfoPtr: CPointer<GFileInfo>? = null) : Closable {
     public val gFileInfoPtr: CPointer<GFileInfo>? = fileInfoPtr ?: g_file_info_new()

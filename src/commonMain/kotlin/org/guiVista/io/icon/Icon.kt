@@ -1,4 +1,4 @@
-package org.guiVista.io
+package org.guiVista.io.icon
 
 /** Represents an icon. */
 public expect class Icon : IconBase {

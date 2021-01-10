@@ -1,4 +1,4 @@
-package org.guiVista.io
+package org.guiVista.io.icon
 
 import gio2.*
 import glib2.TRUE
@@ -6,7 +6,7 @@ import kotlinx.cinterop.CPointer
 import kotlinx.cinterop.toKString
 
 public actual class Icon private constructor(iconPtr: CPointer<GIcon>?) : IconBase {
-    public val gIconPtr: CPointer<GIcon>? = iconPtr
+    public override val gIconPtr: CPointer<GIcon>? = iconPtr
 
     public actual companion object {
         /** Creates a new [Icon] instance from a iconPtr. */

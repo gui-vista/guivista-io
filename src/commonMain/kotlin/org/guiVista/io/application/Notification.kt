@@ -1,7 +1,7 @@
 package org.guiVista.io.application
 
 import org.guiVista.core.ObjectBase
-import org.guiVista.io.Icon
+import org.guiVista.io.icon.Icon
 
 /** User Notifications (pop up messages). */
 public expect class Notification(title: String) : ObjectBase {

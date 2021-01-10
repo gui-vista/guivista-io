@@ -4,7 +4,7 @@ import gio2.*
 import glib2.g_object_unref
 import kotlinx.cinterop.CPointer
 import org.guiVista.core.ObjectBase
-import org.guiVista.io.Icon
+import org.guiVista.io.icon.Icon
 
 /** User Notifications (pop up messages). */
 public actual class Notification actual constructor(title: String) : ObjectBase {

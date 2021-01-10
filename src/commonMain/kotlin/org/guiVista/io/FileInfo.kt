@@ -1,6 +1,7 @@
 package org.guiVista.io
 
 import org.guiVista.core.Closable
+import org.guiVista.io.icon.Icon
 
 /** File information and attributes. */
 public expect class FileInfo : Closable {
