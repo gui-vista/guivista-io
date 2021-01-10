@@ -9,6 +9,7 @@ import org.guiVista.core.ObjectBase
 import org.guiVista.core.connectGSignal
 import org.guiVista.core.disconnectGSignal
 import org.guiVista.io.File
+import org.guiVista.io.application.action.ActionGroup
 import org.guiVista.io.application.action.ActionMap
 
 private const val ACTIVATE_SIGNAL = "activate"
@@ -16,9 +17,11 @@ private const val STARTUP_SIGNAL = "startup"
 private const val SHUTDOWN_SIGNAL = "shutdown"
 private const val OPEN_SIGNAL = "open"
 
-public actual interface ApplicationBase : ActionMap, ObjectBase {
+public actual interface ApplicationBase : ActionMap, ActionGroup, ObjectBase {
     public val gApplicationPtr: CPointer<GApplication>?
     override val gActionMapPtr: CPointer<GActionMap>?
+        get() = gApplicationPtr?.reinterpret()
+    override val gActionGroupPtr: CPointer<GActionGroup>?
         get() = gApplicationPtr?.reinterpret()
 
     /** The unique identifier for the application. Default value is *""* (an empty String). */
@@ -163,7 +166,7 @@ public actual interface ApplicationBase : ActionMap, ObjectBase {
     public fun run(): Int = g_application_run(gApplicationPtr, 0, null)
 
     override fun disconnectSignal(handlerId: ULong) {
-        super.disconnectSignal(handlerId)
+        super<ActionGroup>.disconnectSignal(handlerId)
         disconnectGSignal(gApplicationPtr, handlerId.toUInt())
     }
 
