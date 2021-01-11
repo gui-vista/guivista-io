@@ -47,7 +47,7 @@ public actual class SimpleAction private constructor(ptr: CPointer<GSimpleAction
         g_simple_action_set_enabled(gSimpleActionPtr, if (enabled) TRUE else FALSE)
     }
 
-    actual override fun changeState(value: Variant) {
+    override fun changeState(value: Variant) {
         g_simple_action_set_state(gSimpleActionPtr, value.gVariantPtr)
     }
 

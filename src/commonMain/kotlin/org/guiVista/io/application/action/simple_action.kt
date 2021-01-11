@@ -18,14 +18,4 @@ public expect class SimpleAction : Action, ObjectBase {
      * @param stateHint A [Variant] representing that state hint.
      */
     public fun changeStateHint(stateHint: Variant)
-
-    /**
-     * Sets the state of the action. This directly updates the **state** property to the given value. This should only
-     * be called by the implementor of the action. Users of the action should not attempt to directly modify the
-     * **state** property. Instead they should call `g_action_change_state` to request the change.
-     *
-     * If the [value] is floating then it is consumed.
-     * @param value The new [Variant] for the state.
-     */
-    public fun changeState(value: Variant)
 }

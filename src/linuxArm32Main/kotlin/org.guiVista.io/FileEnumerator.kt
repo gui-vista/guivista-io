@@ -18,17 +18,17 @@ public actual class FileEnumerator(fileEnumeratorPtr: CPointer<GFileEnumerator>)
     public actual val nextFileError: Error?
         get() {
             val tmp = nextFileErrorPtrVar.value
-            return if (tmp != null) Error.fromErrorPtr(tmp) else null
+            return if (tmp != null) Error.fromErrorPointer(tmp) else null
         }
     public actual val closeError: Error?
         get() {
             val tmp = closeErrorPtrVar.value
-            return if (tmp != null) Error.fromErrorPtr(tmp) else null
+            return if (tmp != null) Error.fromErrorPointer(tmp) else null
         }
     public actual val iterateError: Error?
         get() {
             val tmp = iterateErrorPtrVar.value
-            return if (tmp != null) Error.fromErrorPtr(tmp) else null
+            return if (tmp != null) Error.fromErrorPointer(tmp) else null
         }
     public actual val isClosed: Boolean
         get() = g_file_enumerator_is_closed(gFileEnumeratorPtr) == TRUE
